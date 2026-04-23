@@ -7,13 +7,11 @@ public class GameManager : MonoBehaviour
     public PokemonAPI api;
     public UIManager ui;
 
-    int score = 0;
-    string correctAnswer;
+    private int score = 0;
+    private int questionCount = 0;
+    private int maxQuestions = 20;
 
-    int[] pokemonIds = new int[]
-    {
-        1,4,7,25,39,52,54,66,95,81,92,104,145,133,150
-    };
+    private string correctAnswer;
 
     void Start()
     {
@@ -22,10 +20,16 @@ public class GameManager : MonoBehaviour
 
     IEnumerator NewQuestion()
     {
-        int id = pokemonIds[Random.Range(0, pokemonIds.Length)];
-        int type = Random.Range(0, 3);
+        if (questionCount >= maxQuestions)
+        {
+            ui.ShowFinal(score);
+            yield break;
+        }
 
-        List<string> options = new List<string>();
+        questionCount++;
+
+        int id = Random.Range(1, 152);
+        int type = Random.Range(0, 3);
 
         PokemonResult pokemon = null;
 
@@ -34,58 +38,73 @@ public class GameManager : MonoBehaviour
             pokemon = res;
         }));
 
-        if (type != 2) // NON cargar imaxe en descrición
+        ui.ClearUI();
+
+        // 🖼️ IMAXE
+        if (type != 2)
         {
             yield return StartCoroutine(ui.LoadImage(pokemon.imageUrl));
         }
-        else
-        {
-            ui.pokemonImage.sprite = null; // ocultar imaxe
-        }
 
-        if (type == 0)
+        // 🧠 TIPOS DE PREGUNTA
+        if (type == 0) // WHO'S THAT POKEMON
         {
             correctAnswer = pokemon.name;
+            ui.SetQuestion("Who's that Pokémon?");
+            ui.EnableInput(true);
         }
-        else if (type == 1)
+        else if (type == 1) // TYPE
         {
             correctAnswer = pokemon.type;
+            ui.SetQuestion("What type is this Pokémon?");
+            ui.EnableInput(true);
         }
-        else
+        else // DESCRIPTION
         {
             yield return StartCoroutine(api.GetSpecies(id, (desc) =>
             {
-                ui.SetDescription(desc);
+                ui.SetQuestion(desc);
             }));
 
             correctAnswer = pokemon.name;
-        }
 
-        options.Add(correctAnswer);
+            // opcións só con nomes
+            List<string> options = new List<string>();
+            options.Add(correctAnswer);
 
-        while (options.Count < 4)
-        {
-            int rand = pokemonIds[Random.Range(0, pokemonIds.Length)];
-
-            yield return StartCoroutine(api.GetPokemon(rand, (r) =>
+            while (options.Count < 4)
             {
-                if (!options.Contains(r.name))
-                    options.Add(r.name);
-            }));
+                int rand = Random.Range(1, 152);
+
+                yield return StartCoroutine(api.GetPokemon(rand, (r) =>
+                {
+                    if (!options.Contains(r.name))
+                        options.Add(r.name);
+                }));
+            }
+
+            Shuffle(options);
+
+            ui.SetOptions(options.ToArray());
+            ui.EnableButtons(true);
         }
-
-        Shuffle(options);
-
-        ui.SetOptions(options.ToArray());
     }
 
-    public void Answer(string selected)
+    public void SubmitAnswer(string answer)
     {
-        if (selected == correctAnswer)
+        if (answer.ToLower().Trim() == correctAnswer.ToLower())
             score++;
 
         ui.SetScore(score);
+        StartCoroutine(NewQuestion());
+    }
 
+    public void SelectOption(string option)
+    {
+        if (option == correctAnswer)
+            score++;
+
+        ui.SetScore(score);
         StartCoroutine(NewQuestion());
     }
 
