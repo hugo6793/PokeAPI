@@ -34,7 +34,14 @@ public class GameManager : MonoBehaviour
             pokemon = res;
         }));
 
-        yield return StartCoroutine(ui.LoadImage(pokemon.image));
+        if (type != 2) // NON cargar imaxe en descrición
+        {
+            yield return StartCoroutine(ui.LoadImage(pokemon.imageUrl));
+        }
+        else
+        {
+            ui.pokemonImage.sprite = null; // ocultar imaxe
+        }
 
         if (type == 0)
         {

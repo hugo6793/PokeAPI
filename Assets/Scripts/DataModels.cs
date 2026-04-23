@@ -34,11 +34,18 @@ public class SpeciesData
 public class FlavorText
 {
     public string flavor_text;
+    public Language language;
+}
+
+[System.Serializable]
+public class Language
+{
+    public string name;
 }
 
 public class PokemonResult
 {
     public string name;
-    public string image;
+    public string imageUrl;
     public string type;
 }

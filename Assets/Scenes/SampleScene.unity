@@ -1357,8 +1357,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pokemonImage: {fileID: 705576596}
-  descriptionText: {fileID: 0}
-  scoreText: {fileID: 0}
+  descriptionText: {fileID: 1702213638}
+  scoreText: {fileID: 1518421596}
   buttons:
   - {fileID: 1792921459}
   - {fileID: 1321090738}

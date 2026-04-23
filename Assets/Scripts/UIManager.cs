@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Networking;
@@ -6,8 +7,8 @@ using UnityEngine.Networking;
 public class UIManager : MonoBehaviour
 {
     public Image pokemonImage;
-    public Text descriptionText;
-    public Text scoreText;
+    public TMP_Text descriptionText;
+    public TMP_Text scoreText;
     public Button[] buttons;
 
     public IEnumerator LoadImage(string url)
@@ -28,7 +29,7 @@ public class UIManager : MonoBehaviour
         {
             string opt = options[i];
 
-            buttons[i].GetComponentInChildren<Text>().text = opt;
+            buttons[i].GetComponentInChildren<TMP_Text>().text = opt;
 
             buttons[i].onClick.RemoveAllListeners();
             buttons[i].onClick.AddListener(() =>
